@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASL Web Recognition Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-grad-1: #0f172a;
+            --bg-grad-2: #1e293b;
+            --primary: #38bdf8;
+            --surface: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2));
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .title {
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin: 0;
+            background: -webkit-linear-gradient(45deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: var(--surface);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .video-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            width: 640px;
+            height: 480px;
+            background: #000;
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--border);
+        }
+        img.video-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border);
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+            transition: all 0.3s ease;
+        }
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 640px;
+            margin-top: 1.5rem;
+            gap: 1rem;
+        }
+        .stat-card {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            background: rgba(56, 189, 248, 0.1);
+            transform: translateY(-2px);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #f8fafc;
+            margin-top: 0.5rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+        .sentence-box {
+            width: 100%;
+            max-width: 640px;
+            margin-top: 1.5rem;
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            min-height: 80px;
+            word-wrap: break-word;
+            color: #e2e8f0;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 2rem;
+            background: var(--primary);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .controls-panel {
+            width: 100%;
+            max-width: 640px;
+            margin-top: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-sizing: border-box;
+        }
+        .slider-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .slider-label {
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        input[type=range] {
+            width: 50%;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .clear-btn, .pause-btn, .primary-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .primary-btn:disabled, .pause-btn:disabled, input[type=range]:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .clear-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+        .clear-btn:active, .pause-btn:active {
+            transform: translateY(0);
+        }
+        .pause-btn {
+            background: rgba(234, 179, 8, 0.1);
+            color: #facc15;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+        .pause-btn:hover {
+            background: rgba(234, 179, 8, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">ASL Hub</h1>
+        <div class="subtitle">AI Sign Language Translator · High-Performance Web Portal</div>
+    </div>
+    
+    <div class="main-container">
+        <div class="video-wrapper">
+            <div class="status-badge"><div class="dot" id="statusDot"></div> <span id="statusText">Live Translation Feed</span></div>
+            <img class="video-feed" src="/video_feed" alt="Webcam Feed Loading...">
+        </div>
+        
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-label">Recognized</div>
+                <div class="stat-value" id="currentChar" style="color: var(--primary)">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Network Confidence</div>
+                <div class="stat-value" id="confidence">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Global Latency</div>
+                <div class="stat-value" id="latency">0ms</div>
+            </div>
+        </div>
+        
+        <div class="sentence-box">
+            <span id="sentenceText">Listening...</span><span class="cursor"></span>
+        </div>
+        
+        <div class="controls-panel">
+            <div class="slider-container">
+                <label for="thresholdSlider" class="slider-label">Minimum Confidence: <span id="thresholdValue" style="color: var(--primary);">70%</span></label>
+                <input type="range" id="thresholdSlider" min="0" max="100" value="70" oninput="updateThresholdText()" onchange="sendThreshold()">
+            </div>
+            <div class="button-group">
+                <button class="primary-btn" id="videoBtn" onclick="toggleVideo()" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">Start Video</button>
+                <button class="clear-btn" onclick="clearText()">Clear Translation</button>
+                <button class="pause-btn" id="pauseBtn" onclick="togglePause()">Pause Translation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastRenderedSentence = null;
+
+        function fetchState() {
+            fetch('/state')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('currentChar').innerText = data.current_char || '-';
+                    document.getElementById('confidence').innerText = data.confidence ? (data.confidence * 100).toFixed(1) + '%' : '0%';
+                    document.getElementById('latency').innerText = data.latency ? data.latency.toFixed(1) + 'ms' : '0ms';
+                    
+                    if (data.sentence !== lastRenderedSentence) {
+                        const sentenceElem = document.getElementById('sentenceText');
+                        if(data.sentence.trim() === "") {
+                            sentenceElem.style.opacity = 0.5;
+                            sentenceElem.style.fontSize = "1.1rem";
+                            sentenceElem.innerText = "Listening...";
+                        } else {
+                            sentenceElem.style.opacity = 1;
+                            sentenceElem.style.fontSize = "1.5rem";
+                            sentenceElem.innerText = data.sentence.replace(/ /g, "\u00A0"); // Preserve spacing properly
+                        }
+                        lastRenderedSentence = data.sentence;
+                    }
+                    
+                    const statusDot = document.getElementById('statusDot');
+                    const statusText = document.getElementById('statusText');
+                    
+                    const videoBtn = document.getElementById('videoBtn');
+                    const pauseBtn = document.getElementById('pauseBtn');
+                    const slider = document.getElementById('thresholdSlider');
+                    
+                    if (data.video_active) {
+                        statusDot.style.background = "#22c55e";
+                        statusDot.style.boxShadow = "0 0 10px #22c55e";
+                        statusText.innerText = "Live Translation Feed";
+                        
+                        videoBtn.innerText = "Stop Video";
+                        videoBtn.style.color = "#ef4444";
+                        videoBtn.style.borderColor = "rgba(239, 68, 68, 0.3)";
+                        videoBtn.style.background = "rgba(239, 68, 68, 0.1)";
+                        
+                        pauseBtn.disabled = false;
+                        slider.disabled = true;
+                    } else {
+                        statusDot.style.background = "#ef4444";
+                        statusDot.style.boxShadow = "0 0 10px #ef4444";
+                        statusText.innerText = "Camera Offline";
+                        
+                        videoBtn.innerText = "Start Video";
+                        videoBtn.style.color = "#38bdf8";
+                        videoBtn.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                        videoBtn.style.background = "rgba(56, 189, 248, 0.1)";
+                        
+                        pauseBtn.disabled = true;
+                        slider.disabled = false;
+                    }
+                })
+                .catch(err => {
+                    // Fail silently so UI doesn't visually break when video loads slow
+                });
+        }
+        
+        function clearText() {
+            fetch('/clear', { method: 'POST' })
+                .then(response => response.json())
+                .catch(err => console.error(err));
+        }
+        
+        function toggleVideo() {
+            fetch('/toggle_video', { method: 'POST' })
+                .catch(err => console.error(err));
+        }
+
+        function togglePause() {
+            fetch('/toggle_pause', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    const btn = document.getElementById('pauseBtn');
+                    if(data.paused) {
+                        btn.innerText = "Resume Translation";
+                        btn.style.color = "#22c55e"; // Success Green
+                        btn.style.borderColor = "rgba(34, 197, 94, 0.3)";
+                        btn.style.background = "rgba(34, 197, 94, 0.1)";
+                    } else {
+                        btn.innerText = "Pause Translation";
+                        btn.style.color = "#facc15"; // Yellow
+                        btn.style.borderColor = "rgba(234, 179, 8, 0.3)";
+                        btn.style.background = "rgba(234, 179, 8, 0.1)";
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+        
+        function updateThresholdText() {
+            const val = document.getElementById('thresholdSlider').value;
+            document.getElementById('thresholdValue').innerText = val + '%';
+        }
+        
+        function sendThreshold() {
+            const val = document.getElementById('thresholdSlider').value;
+            fetch('/set_threshold', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ threshold: parseFloat(val) / 100.0 })
+            }).catch(err => console.error(err));
+        }
+        
+        // Polling the local state from python 10 times a second
+        setInterval(fetchState, 100);
+    </script>
+</body>
+</html>
