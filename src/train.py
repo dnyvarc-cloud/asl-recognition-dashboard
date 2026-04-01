@@ -9,7 +9,10 @@ import numpy as np
 class ASLDataset(Dataset):
     def __init__(self, csv_file):
         df = pd.read_csv(csv_file)
-        self.labels = [ord(c) - ord('A') for c in df['label']]
+        def label_to_id(c):
+            if str(c).lower() == 'space': return 26
+            return ord(str(c)) - ord('A')
+        self.labels = [label_to_id(c) for c in df['label']]
         self.features = df.drop('label', axis=1).values
         
     def __len__(self):
@@ -19,7 +22,7 @@ class ASLDataset(Dataset):
         return torch.tensor(self.features[idx], dtype=torch.float32), torch.tensor(self.labels[idx], dtype=torch.long)
 
 class ASLClassifier(nn.Module):
-    def __init__(self, input_size=63, hidden_sizes=[128, 64], num_classes=26):
+    def __init__(self, input_size=63, hidden_sizes=[256, 128], num_classes=27):
         super(ASLClassifier, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_sizes[0])
         self.relu = nn.ReLU()
@@ -94,14 +97,5 @@ def train_model(data_dir, model_save_path, epochs=20, lr=0.001):
             
     test_acc = correct / total
     print(f"Final Test Accuracy: {test_acc:.4f}")
-    
-    # Optional: Export to ONNX
-    dummy_input = torch.randn(1, 63)
-    onnx_path = model_save_path.replace('.pth', '.onnx')
-    torch.onnx.export(model, dummy_input, onnx_path, 
-                      input_names=['input'], output_names=['output'], 
-                      dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}})
-    print(f"Exported to ONNX: {onnx_path}")
-
 if __name__ == '__main__':
-    train_model('data/processed', 'models/asl_mlp.pth', epochs=30)
+    train_model('data/processed', 'models/asl_mlp.pth', epochs=150)

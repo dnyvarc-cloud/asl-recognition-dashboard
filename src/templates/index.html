@@ -4,155 +4,230 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASL Web Recognition Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-grad-1: #0f172a;
-            --bg-grad-2: #1e293b;
-            --primary: #38bdf8;
-            --surface: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --bg-base: #f4f1ea;
+            --surface: #ffffff;
+            --surface-hover: #fcfbfa;
+            --border: #e0ddd3;
+            --text-primary: #2d2b27;
+            --text-secondary: #76736a;
+            --success: #10b981;
+            --danger: #ef4444;
         }
         body {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2));
-            color: white;
-            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         .header {
-            margin-top: 2rem;
+            margin-top: 4rem;
             text-align: center;
-        }
-        .title {
-            font-weight: 800;
-            font-size: 2.5rem;
-            margin: 0;
-            background: -webkit-linear-gradient(45deg, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle {
-            font-size: 1rem;
-            color: #94a3b8;
-            margin-top: 0.5rem;
-        }
-        .main-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            max-width: 900px;
+        }
+        .title {
+            font-weight: 600;
+            font-size: 2.5rem;
+            letter-spacing: -0.04em;
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-weight: 400;
+        }
+        .top-nav {
             margin-top: 2rem;
-            padding: 2rem;
+            display: flex;
+            background: rgba(0, 0, 0, 0.03);
+            backdrop-filter: blur(12px);
+            padding: 6px;
+            border-radius: 99px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            gap: 4px;
+            justify-content: center;
+        }
+        .nav-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            padding: 8px 32px;
+            font-size: 0.9rem;
+            border-radius: 99px;
+            font-weight: 500;
+        }
+        .nav-btn.active {
             background: var(--surface);
-            border-radius: 20px;
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .nav-btn:hover:not(.active) {
+            color: var(--text-primary);
+        }
+        .main-container {
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+            align-items: flex-start;
+            justify-content: center;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        .video-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .data-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 600px;
         }
         .video-wrapper {
             position: relative;
             border-radius: 12px;
             overflow: hidden;
-            width: 640px;
-            height: 480px;
-            background: #000;
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.1);
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 4/3;
+            background: #e9e8e4;
             border: 1px solid var(--border);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
         }
         img.video-feed {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+        .video-overlay-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 10;
+            backdrop-filter: blur(12px);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .video-overlay-btn:hover {
+            background: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
         .status-badge {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 8px;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         .dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
+            width: 6px;
+            height: 6px;
+            background: var(--success);
             border-radius: 50%;
-            box-shadow: 0 0 10px #22c55e;
-            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+            transition: background 0.3s ease;
         }
         .stats-panel {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 640px;
-            margin-top: 1.5rem;
             gap: 1rem;
         }
         .stat-card {
             flex: 1;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--surface);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 1.25rem 1rem;
             border: 1px solid var(--border);
             text-align: center;
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .stat-card:hover {
-            background: rgba(56, 189, 248, 0.1);
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
         }
         .stat-label {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.02em;
         }
         .stat-value {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #f8fafc;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
             margin-top: 0.5rem;
-            text-shadow: 0 0 10px rgba(255,255,255,0.2);
         }
         .sentence-box {
             width: 100%;
-            max-width: 640px;
-            margin-top: 1.5rem;
-            background: rgba(56, 189, 248, 0.05);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 1.5rem;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 400;
-            letter-spacing: 2px;
+            letter-spacing: -0.01em;
+            line-height: 1.5;
             min-height: 80px;
-            word-wrap: break-word;
-            color: #e2e8f0;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
-            text-align: left;
+            color: var(--text-primary);
             box-sizing: border-box;
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);    
         }
         .cursor {
             display: inline-block;
-            width: 3px;
-            height: 2rem;
-            background: var(--primary);
-            animation: blink 1s infinite;
-            vertical-align: middle;
-            margin-left: 5px;
+            width: 2px;
+            height: 1.2em;
+            background: var(--text-primary);
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            margin-top: 4px;
         }
         @keyframes blink {
             0%, 100% { opacity: 1; }
@@ -160,13 +235,12 @@
         }
         .controls-panel {
             width: 100%;
-            max-width: 640px;
-            margin-top: 1.5rem;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--surface);
             border-radius: 12px;
             padding: 1.5rem;
             border: 1px solid var(--border);
             box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
         .slider-container {
             display: flex;
@@ -175,101 +249,130 @@
             margin-bottom: 1.5rem;
         }
         .slider-label {
-            font-weight: 600;
-            color: #e2e8f0;
-            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
         }
         input[type=range] {
+            -webkit-appearance: none;
             width: 50%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: var(--text-primary);
             cursor: pointer;
-            accent-color: var(--primary);
+            margin-top: -5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: var(--border);
+            border-radius: 2px;
         }
         .button-group {
             display: flex;
-            gap: 1.5rem;
-            justify-content: center;
+            gap: 1rem;
+            justify-content: flex-start;
         }
-        .clear-btn, .pause-btn, .primary-btn {
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
+        button {
+            font-family: 'Inter', -apple-system, sans-serif;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .primary-btn:disabled, .pause-btn:disabled, input[type=range]:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
+            transition: all 0.2s ease;
         }
         .clear-btn {
-            background: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
         }
         .clear-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-        }
-        .clear-btn:active, .pause-btn:active {
-            transform: translateY(0);
+            background: rgba(0,0,0,0.03);
+            border-color: var(--text-secondary);
         }
         .pause-btn {
-            background: rgba(234, 179, 8, 0.1);
-            color: #facc15;
-            border: 1px solid rgba(234, 179, 8, 0.3);
+            background: var(--text-primary);
+            color: #fff;
+            border: 1px solid var(--text-primary);
         }
         .pause-btn:hover {
-            background: rgba(234, 179, 8, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.2);
+            background: #444340;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="title">ASL Hub</h1>
-        <div class="subtitle">AI Sign Language Translator · High-Performance Web Portal</div>
+        <h1 class="title">Signa</h1>
+        <div class="subtitle">AI Sign Language Translator</div>
+        
+        <nav class="top-nav">
+            <button class="nav-btn active" id="nav-translate" onclick="switchView('translate')">Translate</button>
+            <button class="nav-btn" id="nav-about" onclick="switchView('about')">About</button>
+        </nav>
     </div>
     
-    <div class="main-container">
-        <div class="video-wrapper">
-            <div class="status-badge"><div class="dot" id="statusDot"></div> <span id="statusText">Live Translation Feed</span></div>
-            <img class="video-feed" src="/video_feed" alt="Webcam Feed Loading...">
-        </div>
-        
-        <div class="stats-panel">
-            <div class="stat-card">
-                <div class="stat-label">Recognized</div>
-                <div class="stat-value" id="currentChar" style="color: var(--primary)">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Network Confidence</div>
-                <div class="stat-value" id="confidence">0%</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Global Latency</div>
-                <div class="stat-value" id="latency">0ms</div>
+    <div class="main-container" id="translate-view">
+        <div class="video-section">
+            <div class="video-wrapper">
+                <button class="video-overlay-btn" id="videoBtn" onclick="toggleVideo()">Start Video</button>
+                <div class="status-badge"><div class="dot" id="statusDot"></div> <span id="statusText">Live Translation Feed</span></div>
+                <img class="video-feed" src="/video_feed" alt="">
             </div>
         </div>
         
-        <div class="sentence-box">
-            <span id="sentenceText">Listening...</span><span class="cursor"></span>
+        <div class="data-section">
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-label">Recognized</div>
+                    <div class="stat-value" id="currentChar" style="color: var(--text-primary)">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Network Confidence</div>
+                    <div class="stat-value" id="confidence">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Global Latency</div>
+                    <div class="stat-value" id="latency">0ms</div>
+                </div>
+            </div>
+            
+            <div class="sentence-box">
+                <span id="sentenceText"></span><span class="cursor"></span>
+            </div>
+            
+            <div class="controls-panel">
+                <div class="slider-container">
+                    <label for="thresholdSlider" class="slider-label">Minimum Confidence: <span id="thresholdValue" style="color: var(--text-primary);">70%</span></label>
+                    <input type="range" id="thresholdSlider" min="0" max="100" value="70" oninput="updateThresholdText()" onchange="sendThreshold()">
+                </div>
+                <div class="button-group">
+                    <button class="clear-btn" onclick="clearText()">Clear Translation</button>
+                    <button class="pause-btn" id="pauseBtn" onclick="togglePause()">Pause Translation</button>
+                </div>
+            </div>
         </div>
-        
-        <div class="controls-panel">
-            <div class="slider-container">
-                <label for="thresholdSlider" class="slider-label">Minimum Confidence: <span id="thresholdValue" style="color: var(--primary);">70%</span></label>
-                <input type="range" id="thresholdSlider" min="0" max="100" value="70" oninput="updateThresholdText()" onchange="sendThreshold()">
-            </div>
-            <div class="button-group">
-                <button class="primary-btn" id="videoBtn" onclick="toggleVideo()" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">Start Video</button>
-                <button class="clear-btn" onclick="clearText()">Clear Translation</button>
-                <button class="pause-btn" id="pauseBtn" onclick="togglePause()">Pause Translation</button>
-            </div>
+    </div>
+
+    <!-- About View Section -->
+    <div class="main-container" id="about-view" style="display: none;">
+        <div class="about-card" style="width: 100%; max-width: 800px; background: var(--surface); border-radius: 12px; padding: 3rem; border: 1px solid var(--border); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); text-align: left; box-sizing: border-box;">
+            <h2 style="margin-top: 0; font-size: 2rem; font-weight: 600; letter-spacing: -0.04em;">Our Mission</h2>
+            <p style="font-size: 1.15rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 2.5rem;">We are a passionate team of developers dedicated to breaking down communication barriers. By leveraging state-of-the-art computer vision and machine learning, we built Signa to enable fluid, real-time American Sign Language translation in a modern, accessible web environment.</p>
+            
+            <h3 style="margin-top: 2rem; font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em;">Technologies Used</h3>
+            <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 1.5rem; font-size: 1.05rem;">
+                <li><strong style="color: var(--text-primary)">MediaPipe Hands</strong> for robust sub-millisecond skeleton detection.</li>
+                <li><strong style="color: var(--text-primary)">PyTorch</strong> lightweight deep learning temporal classification models.</li>
+                <li><strong style="color: var(--text-primary)">Flask & OpenCV</strong> for high-performance localized video streaming.</li>
+            </ul>
         </div>
     </div>
 
@@ -286,15 +389,7 @@
                     
                     if (data.sentence !== lastRenderedSentence) {
                         const sentenceElem = document.getElementById('sentenceText');
-                        if(data.sentence.trim() === "") {
-                            sentenceElem.style.opacity = 0.5;
-                            sentenceElem.style.fontSize = "1.1rem";
-                            sentenceElem.innerText = "Listening...";
-                        } else {
-                            sentenceElem.style.opacity = 1;
-                            sentenceElem.style.fontSize = "1.5rem";
-                            sentenceElem.innerText = data.sentence.replace(/ /g, "\u00A0"); // Preserve spacing properly
-                        }
+                        sentenceElem.innerText = data.sentence.replace(/ /g, "\u00A0");
                         lastRenderedSentence = data.sentence;
                     }
                     
@@ -306,29 +401,30 @@
                     const slider = document.getElementById('thresholdSlider');
                     
                     if (data.video_active) {
-                        statusDot.style.background = "#22c55e";
-                        statusDot.style.boxShadow = "0 0 10px #22c55e";
+                        statusDot.style.background = "var(--success)";
+                        statusDot.style.boxShadow = "0 0 8px rgba(16, 185, 129, 0.3)";
                         statusText.innerText = "Live Translation Feed";
                         
                         videoBtn.innerText = "Stop Video";
-                        videoBtn.style.color = "#ef4444";
-                        videoBtn.style.borderColor = "rgba(239, 68, 68, 0.3)";
-                        videoBtn.style.background = "rgba(239, 68, 68, 0.1)";
+                        videoBtn.style.color = "var(--danger)";
+                        videoBtn.style.borderColor = "rgba(0, 0, 0, 0.08)";
+                        videoBtn.style.background = "rgba(255, 255, 255, 0.95)";
                         
-                        pauseBtn.disabled = false;
-                        slider.disabled = true;
+                        // Set disabled true dynamically causes visual freezing? Yes, but usually disabled styling handles it.
+                        if(pauseBtn) pauseBtn.disabled = false;
+                        if(slider) slider.disabled = true;
                     } else {
-                        statusDot.style.background = "#ef4444";
-                        statusDot.style.boxShadow = "0 0 10px #ef4444";
+                        statusDot.style.background = "var(--text-secondary)";
+                        statusDot.style.boxShadow = "none";
                         statusText.innerText = "Camera Offline";
                         
                         videoBtn.innerText = "Start Video";
-                        videoBtn.style.color = "#38bdf8";
-                        videoBtn.style.borderColor = "rgba(56, 189, 248, 0.3)";
-                        videoBtn.style.background = "rgba(56, 189, 248, 0.1)";
+                        videoBtn.style.color = "var(--text-primary)";
+                        videoBtn.style.borderColor = "rgba(0, 0, 0, 0.08)";
+                        videoBtn.style.background = "rgba(255, 255, 255, 0.9)";
                         
-                        pauseBtn.disabled = true;
-                        slider.disabled = false;
+                        if(pauseBtn) pauseBtn.disabled = true;
+                        if(slider) slider.disabled = false;
                     }
                 })
                 .catch(err => {
@@ -354,14 +450,14 @@
                     const btn = document.getElementById('pauseBtn');
                     if(data.paused) {
                         btn.innerText = "Resume Translation";
-                        btn.style.color = "#22c55e"; // Success Green
-                        btn.style.borderColor = "rgba(34, 197, 94, 0.3)";
-                        btn.style.background = "rgba(34, 197, 94, 0.1)";
+                        btn.style.color = "var(--text-primary)";
+                        btn.style.borderColor = "var(--border)";
+                        btn.style.background = "transparent";
                     } else {
                         btn.innerText = "Pause Translation";
-                        btn.style.color = "#facc15"; // Yellow
-                        btn.style.borderColor = "rgba(234, 179, 8, 0.3)";
-                        btn.style.background = "rgba(234, 179, 8, 0.1)";
+                        btn.style.color = "#fff";
+                        btn.style.borderColor = "var(--text-primary)";
+                        btn.style.background = "var(--text-primary)";
                     }
                 })
                 .catch(err => console.error(err));
@@ -381,7 +477,20 @@
             }).catch(err => console.error(err));
         }
         
-        // Polling the local state from python 10 times a second
+        function switchView(viewName) {
+            if (viewName === 'translate') {
+                document.getElementById('translate-view').style.display = 'flex';
+                document.getElementById('about-view').style.display = 'none';
+                document.getElementById('nav-translate').classList.add('active');
+                document.getElementById('nav-about').classList.remove('active');
+            } else if (viewName === 'about') {
+                document.getElementById('translate-view').style.display = 'none';
+                document.getElementById('about-view').style.display = 'flex';
+                document.getElementById('nav-about').classList.add('active');
+                document.getElementById('nav-translate').classList.remove('active');
+            }
+        }
+        
         setInterval(fetchState, 100);
     </script>
 </body>

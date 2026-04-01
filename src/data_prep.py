@@ -34,6 +34,10 @@ def extract_landmarks_from_image(image_path, detector):
     if image is None:
         return None
         
+    h, w = image.shape[:2]
+    pad_h, pad_w = h // 2, w // 2
+    image = cv2.copyMakeBorder(image, pad_h, pad_h, pad_w, pad_w, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+        
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image_rgb)
     
@@ -63,7 +67,9 @@ def process_image_dataset(image_dir, output_csv):
     options = vision.HandLandmarkerOptions(
         base_options=base_options,
         num_hands=1,
-        running_mode=vision.RunningMode.IMAGE
+        running_mode=vision.RunningMode.IMAGE,
+        min_hand_detection_confidence=0.1,
+        min_hand_presence_confidence=0.1
     )
     detector = vision.HandLandmarker.create_from_options(options)
     
@@ -97,10 +103,10 @@ def ingest_and_split(input_csv, output_dir, test_size=0.2, val_size=0.1):
     X = df.drop('label', axis=1)
     y = df['label']
     
-    X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=test_size, random_state=42, stratify=y)
+    X_train_val, X_test, y_train_val, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
     
     val_ratio = val_size / (1.0 - test_size)
-    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=val_ratio, random_state=42, stratify=y_train_val)
+    X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=val_ratio, random_state=42)
     
     os.makedirs(output_dir, exist_ok=True)
     

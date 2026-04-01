@@ -122,7 +122,8 @@ def main():
                         probabilities = torch.nn.functional.softmax(output, dim=1)
                         score, predicted = torch.max(probabilities.data, 1)
                         
-                    pred_char = chr(predicted.item() + ord('A'))
+                    idx = predicted.item()
+                    pred_char = ' ' if idx == 26 else chr(idx + ord('A'))
                     conf_score = score.item()
                     
                     # Temporal Smoothing
