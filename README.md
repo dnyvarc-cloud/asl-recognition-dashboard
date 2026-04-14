@@ -33,10 +33,17 @@ A high-performance, real-time American Sign Language (ASL) translator. This syst
    ```
 5. **Open Browser**: Navigate to `http://localhost:5001`.
 
-## Custom Retraining Instructions
-If you wish to feed real-world datasets (such as the Kaggle ASL A-Z Hand Landmarks dataset) to achieve production $>95\%$ accuracy metrics immediately over my included synthetic dummy architecture:
+## Retraining Instructions
 
+If landmark rows (CSV data) is ready, then follow this:
 1. Place your CSV data in `/data/`.
 2. Normalize coordinates and format logic: `python3 src/data_prep.py --input_csv data/your_dataset.csv`
 3. Hit re-compile on the deep learning network: `python3 src/train.py`
-The system will instantly output an optimized `asl_mlp.pth` overriding the default configuration. Restart your Web Server to utilize your new intelligence!
+The system will instantly output an optimized `asl_mlp.pth`. Restart your Web Server to utilize your new intelligence!
+
+For images files(png, jpg and jpeg) from Kaggle Dataset, create landmark rows(csv file) first.
+1. Place your image files in `/data/images/`.
+2. Create landmark csv file `python3 src/data_prep.py --image_dir data/images --extract_csv data/landmarks.csv`
+3. Normalize coordinates and format logic: `python3 src/data_prep.py --input_csv data/landmarks.csv`
+4. Hit re-compile on the deep learning network: `python3 src/train.py`
+The system will instantly output an optimized `asl_mlp.pth`. Restart your Web Server to utilize your new intelligence!
